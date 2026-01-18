@@ -3,67 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>舔狗总司令部 - 后台管理</title>
+    <title>舔狗总司令部 - 全权管控</title>
     <style>
         body { background: #1a1a1a; color: #fff; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
         h1 { color: #ff4757; text-align: center; }
         
-        /* 登录框样式 */
+        /* 登录框 */
         #login-panel { text-align: center; margin-top: 100px; }
         input { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
-        button { padding: 10px 20px; border-radius: 5px; border: none; background: #ff4757; color: white; cursor: pointer; font-weight: bold; }
-        button:hover { background: #ff6b81; }
+        button { padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-login { background: #ff4757; color: white; }
+        .btn-login:hover { background: #ff6b81; }
 
-        /* 列表样式 */
+        /* 列表区域 */
         #dashboard { display: none; }
-        .quote-item { background: #2d2d2d; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 单条语录样式 */
+        .quote-item { 
+            background: #2d2d2d; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-left: 5px solid #555; /* 默认灰色边框 */
+            transition: 0.3s;
+        }
+
+        /* 状态：已发布 (高亮) */
+        .status-active {
+            border-left-color: #2ecc71; /* 绿色边框 */
+            background: #333;
+        }
+        .status-active .content-text { color: #fff; }
+
+        /* 状态：已隐藏 (变暗) */
+        .status-hidden {
+            border-left-color: #e74c3c; /* 红色边框 */
+            background: #222;
+            opacity: 0.6;
+        }
+        .status-hidden .content-text { color: #888; text-decoration: line-through; }
+
+        /* 按钮组 */
         .actions { display: flex; gap: 10px; }
-        .btn-approve { background: #2ecc71; }
-        .btn-delete { background: #e74c3c; }
+        .btn-approve { background: #2ecc71; color: #fff; }
+        .btn-delete { background: #e74c3c; color: #fff; }
+        .btn-approve:hover { background: #27ae60; }
+        .btn-delete:hover { background: #c0392b; }
+        
+        /* 状态标签 */
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
+        .badge-live { background: #2ecc71; color: #000; }
+        .badge-dead { background: #555; color: #ccc; }
+
+        .timestamp { font-size: 0.8rem; color: #666; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div id="login-panel">
         <h1>👮 舔狗纠察队登录</h1>
-        <input type="text" id="username" placeholder="用户名">
-        <input type="password" id="password" placeholder="密码">
+        <input type="text" id="username" placeholder="用户名 (admin)">
+        <input type="password" id="password" placeholder="密码 (123456)">
         <br><br>
-        <button onclick="login()">登录</button>
+        <button class="btn-login" onclick="login()">登录</button>
     </div>
 
     <div id="dashboard">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>🛡️ 待审核列表</h1>
-            <button onclick="logout()" style="background:#555">退出</button>
+            <h1>🎛️ 状态控制台</h1>
+            <button onclick="logout()" style="background:#555; color:#fff;">退出</button>
         </div>
+        <p style="color:#888; text-align:center; font-size:0.9rem;">
+            🟢 绿色 = 线上显示中 | 🔴 红色/划线 = 已下架/隐藏
+        </p>
         <div id="list">正在加载...</div>
     </div>
 
     <script>
-        // 检查是否已登录
         const token = localStorage.getItem('lick_token');
-        if (token) {
-            showDashboard();
-        }
+        if (token) showDashboard();
 
         async function login() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
-            
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ username: u, password: p })
             });
             const data = await res.json();
-
             if (data.success) {
                 localStorage.setItem('lick_token', data.token);
                 showDashboard();
-            } else {
-                alert(data.error);
-            }
+            } else { alert(data.error); }
         }
 
         function showDashboard() {
@@ -76,30 +111,46 @@
             const res = await fetch('/api/admin', {
                 headers: { 'Authorization': localStorage.getItem('lick_token') }
             });
-            
             if(res.status === 401) { logout(); return; }
             
             const quotes = await res.json();
             const list = document.getElementById('list');
-            list.innerHTML = quotes.length ? '' : '<p style="text-align:center; color:#666">暂无待审核内容，大家都很乖。</p>';
+            list.innerHTML = quotes.length ? '' : '<p style="text-align:center; color:#666">暂无数据。</p>';
 
             quotes.forEach(q => {
                 const div = document.createElement('div');
-                div.className = 'quote-item';
+                // 根据 is_approved 状态给不同的 CSS 类名
+                const isLive = (q.is_approved === 1);
+                div.className = `quote-item ${isLive ? 'status-active' : 'status-hidden'}`;
+                
+                const time = q.created_at ? new Date(q.created_at).toLocaleString() : '未知时间';
+                const statusBadge = isLive 
+                    ? `<span class="badge badge-live">展示中</span>` 
+                    : `<span class="badge badge-dead">已隐藏</span>`;
+
                 div.innerHTML = `
-                    <div style="flex:1; margin-right:20px;">${q.content}</div>
+                    <div style="flex:1; margin-right:20px;">
+                        <span class="timestamp">${time}</span>
+                        ${statusBadge}
+                        <span class="content-text">${q.content}</span>
+                    </div>
                     <div class="actions">
-                        <button class="btn-approve" onclick="audit(${q.id}, 'approve')">通过</button>
-                        <button class="btn-delete" onclick="audit(${q.id}, 'delete')">枪毙</button>
+                        ${isLive 
+                            ? `<button class="btn-delete" onclick="toggleStatus(${q.id}, 'delete')">隐藏</button>` 
+                            : `<button class="btn-approve" onclick="toggleStatus(${q.id}, 'approve')">恢复</button>`
+                        }
                     </div>
                 `;
                 list.appendChild(div);
             });
         }
 
-        async function audit(id, action) {
-            if(!confirm(action === 'approve' ? '确定通过吗？' : '确定删除吗？')) return;
-
+        async function toggleStatus(id, action) {
+            // 如果是隐藏操作，不需要那么重的确认，轻微确认即可，或者直接操作也行
+            // 这里为了防止手滑，还是保留确认
+            /* if (action === 'delete' && !confirm('确定要隐藏这条吗？')) return;
+            */
+           
             await fetch('/api/admin', {
                 method: 'POST',
                 headers: { 
@@ -108,7 +159,7 @@
                 },
                 body: JSON.stringify({ id, action })
             });
-            loadQuotes(); // 刷新列表
+            loadQuotes(); // 刷新列表，看到状态变化
         }
 
         function logout() {
