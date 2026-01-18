@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>舔狗总司令部 - 后台管理</title>
+    <style>
+        body { background: #1a1a1a; color: #fff; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #ff4757; text-align: center; }
+        
+        /* 登录框样式 */
+        #login-panel { text-align: center; margin-top: 100px; }
+        input { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; border-radius: 5px; border: none; background: #ff4757; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #ff6b81; }
+
+        /* 列表样式 */
+        #dashboard { display: none; }
+        .quote-item { background: #2d2d2d; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .actions { display: flex; gap: 10px; }
+        .btn-approve { background: #2ecc71; }
+        .btn-delete { background: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <div id="login-panel">
+        <h1>👮 舔狗纠察队登录</h1>
+        <input type="text" id="username" placeholder="用户名 (admin)">
+        <input type="password" id="password" placeholder="密码 (123456)">
+        <br><br>
+        <button onclick="login()">登录</button>
+    </div>
+
+    <div id="dashboard">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>🛡️ 待审核列表</h1>
+            <button onclick="logout()" style="background:#555">退出</button>
+        </div>
+        <div id="list">正在加载...</div>
+    </div>
+
+    <script>
+        // 检查是否已登录
+        const token = localStorage.getItem('lick_token');
+        if (token) {
+            showDashboard();
+        }
+
+        async function login() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                localStorage.setItem('lick_token', data.token);
+                showDashboard();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('login-panel').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadQuotes();
+        }
+
+        async function loadQuotes() {
+            const res = await fetch('/api/admin', {
+                headers: { 'Authorization': localStorage.getItem('lick_token') }
+            });
+            
+            if(res.status === 401) { logout(); return; }
+            
+            const quotes = await res.json();
+            const list = document.getElementById('list');
+            list.innerHTML = quotes.length ? '' : '<p style="text-align:center; color:#666">暂无待审核内容，大家都很乖。</p>';
+
+            quotes.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'quote-item';
+                div.innerHTML = `
+                    <div style="flex:1; margin-right:20px;">${q.content}</div>
+                    <div class="actions">
+                        <button class="btn-approve" onclick="audit(${q.id}, 'approve')">通过</button>
+                        <button class="btn-delete" onclick="audit(${q.id}, 'delete')">枪毙</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function audit(id, action) {
+            if(!confirm(action === 'approve' ? '确定通过吗？' : '确定删除吗？')) return;
+
+            await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('lick_token')
+                },
+                body: JSON.stringify({ id, action })
+            });
+            loadQuotes(); // 刷新列表
+        }
+
+        function logout() {
+            localStorage.removeItem('lick_token');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
