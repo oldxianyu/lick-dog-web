@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LICK.DOG - 舔狗日记</title>
+    <style>
+        :root { --primary: #ff4757; --bg: #1a1a1a; --card: #2d2d2d; --text: #e0e0e0; }
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg); color: var(--text); font-family: 'PingFang SC', sans-serif; overflow: hidden; }
+        .container { text-align: center; max-width: 600px; width: 90%; padding: 20px; position: relative; z-index: 1; }
+        h1 { font-size: 3rem; margin-bottom: 5px; font-weight: 900; color: var(--primary); text-shadow: 2px 2px 0px #fff; letter-spacing: -2px; }
+        .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 40px; font-family: monospace; }
+        .content-box { background: var(--card); padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .content-box:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 71, 87, 0.2); }
+        .content-box:active { transform: scale(0.98); }
+        #quote { font-size: 1.3rem; line-height: 1.6; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .tip { position: absolute; bottom: 10px; right: 20px; font-size: 0.7rem; color: #555; opacity: 0.5; }
+        .btn-group { margin-top: 40px; display: flex; gap: 20px; justify-content: center; }
+        .btn { padding: 12px 30px; border: none; font-size: 1rem; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-refresh { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3); }
+        .btn-refresh:hover { background: #ff6b81; transform: translateY(-2px); }
+        .btn-submit { background: transparent; border: 2px solid #444; color: #888; }
+        .btn-submit:hover { border-color: var(--primary); color: var(--primary); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal { background: var(--card); padding: 30px; border-radius: 15px; width: 80%; max-width: 400px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.7); border: 1px solid #333; }
+        .modal h2 { margin-top: 0; color: var(--primary); }
+        textarea { width: 100%; height: 100px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; margin: 15px 0; font-family: inherit; font-size: 1rem; }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.9); color: #000; padding: 10px 20px; border-radius: 50px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LICK.DOG</h1>
+        <div class="subtitle">舔狗日记生成器</div>
+        <div class="content-box" onclick="copyText()" title="点击复制">
+            <div id="quote">正在从数据库加载舔狗语录...</div>
+            <div class="tip">点击文字复制</div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-refresh" onclick="fetchQuote()">换一句舔</button>
+            <button class="btn btn-submit" onclick="openModal()">我也要帮舔</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h2>📝 贡献语录</h2>
+            <p style="color:#888; font-size:0.9rem;">请写下你最卑微的那一刻 (5-100字)</p>
+            <textarea id="submitText" placeholder="宝，你今天..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-submit" style="padding: 8px 20px; font-size: 0.9rem;" onclick="closeModal()">算了</button>
+                <button class="btn btn-refresh" style="padding: 8px 20px; font-size: 0.9rem;" onclick="submitQuote()">投稿</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast">复制成功</div>
+    <script>
+        async function fetchQuote() {
+            const quoteBox = document.getElementById('quote');
+            quoteBox.style.opacity = 0.5;
+            try {
+                const res = await fetch('/api/quote');
+                const data = await res.json();
+                quoteBox.innerText = data.content;
+            } catch (e) {
+                quoteBox.innerText = "网络出错了，就像我们的爱情一样断断续续。";
+            }
+            quoteBox.style.opacity = 1;
+        }
+        async function submitQuote() {
+            const text = document.getElementById('submitText').value.trim();
+            if(!text) return showToast("写点东西吧，沉默是舔不到的。");
+            try {
+                const res = await fetch('/api/quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: text })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    showToast(data.message);
+                    document.getElementById('submitText').value = '';
+                    closeModal();
+                } else {
+                    showToast(data.error);
+                }
+            } catch (e) {
+                showToast("提交失败，可能服务器也失恋了。");
+            }
+        }
+        function copyText() {
+            const text = document.getElementById('quote').innerText;
+            navigator.clipboard.writeText(text).then(() => showToast("复制成功，快发给她！"));
+        }
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.opacity = 1;
+            setTimeout(() => t.style.opacity = 0, 2000);
+        }
+        fetchQuote();
+    </script>
+</body>
+</html>
