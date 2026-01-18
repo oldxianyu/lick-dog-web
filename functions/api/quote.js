@@ -1,5 +1,5 @@
 export async function onRequestGet(context) {
-  // 只获取 is_approved = 1 (已审核) 的语录
+  // 获取随机一条已发布的语录
   const { results } = await context.env.DB.prepare(
     "SELECT content FROM quotes WHERE is_approved = 1 ORDER BY RANDOM() LIMIT 1"
   ).all();
@@ -22,9 +22,9 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: "字数太少没诚意，太多太啰嗦（5-100字）" }), { status: 400 });
     }
 
-    // 注意：这里 is_approved 设为 0 (待审核)
+    // 【关键修改】这里 is_approved 改回 1 (直接通过，无需审核)
     await context.env.DB.prepare(
-      "INSERT INTO quotes (content, is_approved) VALUES (?, 0)"
+      "INSERT INTO quotes (content, is_approved) VALUES (?, 1)"
     ).bind(content).run();
 
     return new Response(JSON.stringify({ success: true, message: "投稿成功！你真是个极品舔狗！" }), {
