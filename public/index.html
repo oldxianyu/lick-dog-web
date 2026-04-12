@@ -160,8 +160,10 @@
       </div>
 
       <div class="actions">
+        <!-- 3 扫光：复制当前 -->
         <button class="btn-sound btn-sound-primary" onclick="copyText()"><span class="shine"></span><span>复制当前</span></button>
-        <button class="btn-sound" onclick="openModal()"><span class="shine"></span><span>我要投稿</span></button>
+        <!-- 1 极简：我要投稿（无扫光） -->
+        <button class="btn-sound" onclick="openModal()"><span>我要投稿</span></button>
       </div>
 
       <div class="features">
@@ -181,7 +183,9 @@
       <p>建议 5-100 字，越像真人越有味道。</p>
       <textarea id="submitText" placeholder="比如：你一天没回我，我还在想是不是你今天太忙了。"></textarea>
       <div class="modal-actions" style="gap:12px;justify-content:flex-end">
-        <button class="btn-sound" onclick="closeModal()"><span class="shine"></span><span>算了</span></button>
+        <!-- 1 极简：算了（无扫光） -->
+        <button class="btn-sound" onclick="closeModal()"><span>算了</span></button>
+        <!-- 3 扫光：投稿 -->
         <button class="btn-sound btn-sound-primary" onclick="submitQuote()"><span class="shine"></span><span>投稿</span></button>
       </div>
     </div>
