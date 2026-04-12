@@ -27,10 +27,10 @@
 
     /* 背景画布与鼠标光晕 */
     .bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .cursor-glow{position:fixed;top:0;left:0;width:140px;height:140px;border-radius:50%;
-      pointer-events:none;z-index:2;mix-blend-mode:multiply;opacity:.65;
-      background: radial-gradient(60% 60% at 50% 50%, rgba(255,61,140,.35), rgba(255,106,168,.18) 60%, transparent 70%);
-      filter: blur(12px); transform: translate(-9999px,-9999px);
+    .cursor-glow{position:fixed;top:0;left:0;width:220px;height:220px;border-radius:50%;
+      pointer-events:none;z-index:9;mix-blend-mode:screen;opacity:.9;
+      background: radial-gradient(45% 45% at 50% 50%, rgba(255,61,140,.65), rgba(255,106,168,.35) 60%, transparent 72%);
+      filter: blur(20px); transform: translate(-9999px,-9999px);
     }
 
     .container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 40px}
@@ -219,7 +219,7 @@
       function frame(){
         x=lerp(x,tx,.18); y=lerp(y,ty,.18);
         glow.style.transform=`translate(${x}px,${y}px)`;
-        glow.style.opacity=visible? .65 : 0;
+        glow.style.opacity=visible? .9 : 0;
         requestAnimationFrame(frame);
       }
       frame();
