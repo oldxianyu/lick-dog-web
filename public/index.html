@@ -167,15 +167,17 @@
     .btn-sound-soft::after{background:#fff;opacity:.92}
     .btn-sound-soft::before{opacity:.5;filter:blur(4px)}
 
-    /* 吸睛款：投稿按钮专用（轻呼吸 + 柔粉内胆 + 微扫光） */
-    .btn-sound-accent{color:#2a2230; transform:scale(1.02)}
+    /* 吸睛款：投稿按钮专用（轻呼吸 + 柔粉内胆 + 微扫光 + 跳动） */
+    .btn-sound-accent{color:#2a2230}
     .btn-sound-accent::after{background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,245,250,.96))}
     .btn-sound-accent::before{opacity:.9;filter:blur(10px)}
     .btn-sound-accent .shine{position:absolute;inset:2px;border-radius:12px;overflow:hidden}
     .btn-sound-accent .shine::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:36%;transform:skewX(-20deg);background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.42) 50%, rgba(255,255,255,0) 100%);filter:blur(2px);animation:shineSweep 3.2s ease-in-out infinite}
-    .btn-sound-accent{animation:gPulse 2.8s ease-in-out infinite}
+    .btn-sound-accent{animation:gPulse 2.8s ease-in-out infinite, btnBounce 1.8s ease-in-out infinite}
+    .btn-sound-accent:hover{transform:none}
 
     @keyframes gPulse{0%,100%{filter:drop-shadow(0 8px 18px rgba(255,61,140,.20))}50%{filter:drop-shadow(0 12px 28px rgba(255,61,140,.34))}}
+    @keyframes btnBounce{0%,100%{transform:translateY(0) scale(1.02)}40%{transform:translateY(-4px) scale(1.03)}60%{transform:translateY(-1px) scale(1.02)}}
 
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
     @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
