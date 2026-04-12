@@ -117,18 +117,26 @@
     .btn-primary:hover::after{ opacity: .85; }
 
     .quote-card:hover{ box-shadow: 0 14px 36px rgba(255,61,140,.18), var(--shadow); }
-    /* SoundCode 风格按钮 */
+    /* SoundCode 风格按钮（参考 hereitis 效果，保持干净 + 轻扫光） */
     .btn-sound{position:relative;display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 18px;border-radius:14px;border:none;background:transparent;color:var(--text);font-weight:900;letter-spacing:.02em;cursor:pointer;transition:transform .15s ease}
-    .btn-sound:active{transform:translateY(1px)}
+    .btn-sound:hover{transform:translateY(-1px)}
+    .btn-sound:active{transform:translateY(0)}
+    /* 外层渐变描边 */
     .btn-sound::before{content:"";position:absolute;inset:0;border-radius:14px;padding:2px;background:linear-gradient(120deg,var(--primary),var(--primary2),#7f5bff,var(--primary));background-size:300% 300%;animation:btnFlow 3.2s linear infinite;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-    .btn-sound::after{content:"";position:absolute;inset:2px;border-radius:12px;background:#fff;opacity:.92}
+    /* 内胆 */
+    .btn-sound::after{content:"";position:absolute;inset:2px;border-radius:12px;background:#fff;opacity:.94}
     .btn-sound > span{position:relative;z-index:1}
+    /* 扫光条 */
+    .btn-sound .shine{position:absolute;inset:2px;border-radius:12px;overflow:hidden;}
+    .btn-sound .shine::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;transform:skewX(-20deg);background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.45) 50%, rgba(255,255,255,0) 100%);filter:blur(2px);animation:shineSweep 2.8s ease-in-out infinite}
+    .btn-sound:hover .shine::before{animation-duration:1.8s}
 
     .btn-sound-primary{color:#fff}
     .btn-sound-primary::after{background:linear-gradient(135deg,var(--primary),var(--primary2))}
-    .btn-sound-primary::before{filter:blur(8px);opacity:.9}
+    .btn-sound-primary::before{filter:blur(6px);opacity:.9}
 
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+    @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
   </style>
 </head>
 <body>
@@ -152,8 +160,8 @@
       </div>
 
       <div class="actions">
-        <button class="btn-sound btn-sound-primary" onclick="copyText()"><span>复制当前</span></button>
-        <button class="btn-sound" onclick="openModal()"><span>我要投稿</span></button>
+        <button class="btn-sound btn-sound-primary" onclick="copyText()"><span class="shine"></span><span>复制当前</span></button>
+        <button class="btn-sound" onclick="openModal()"><span class="shine"></span><span>我要投稿</span></button>
       </div>
 
       <div class="features">
@@ -172,9 +180,9 @@
       <h2>投稿一条新的舔狗语录</h2>
       <p>建议 5-100 字，越像真人越有味道。</p>
       <textarea id="submitText" placeholder="比如：你一天没回我，我还在想是不是你今天太忙了。"></textarea>
-      <div class="modal-actions">
-        <button class="btn" onclick="closeModal()">算了</button>
-        <button class="btn btn-primary" onclick="submitQuote()">投稿</button>
+      <div class="modal-actions" style="gap:12px;justify-content:flex-end">
+        <button class="btn-sound" onclick="closeModal()"><span class="shine"></span><span>算了</span></button>
+        <button class="btn-sound btn-sound-primary" onclick="submitQuote()"><span class="shine"></span><span>投稿</span></button>
       </div>
     </div>
   </div>
