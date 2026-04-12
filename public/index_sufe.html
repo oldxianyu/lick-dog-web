@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LICK.DOG · SUFE 风格首页</title>
+  <meta name="description" content="舔狗日记 · 随机一句 · 一键复制 · 匿名投稿" />
+  <style>
+    :root{
+      --bg:#070a12;--bg2:#0b1220;--text:#eaf1ff;--muted:#9fb0cf;--accent:#6ae3ff;--accent2:#7a9cff;--brand:#7f5bff;--brand2:#33d1ff;--card:rgba(18,26,44,.7);--border:rgba(255,255,255,.1);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;color:var(--text);font-family: Inter, "PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;min-height:100vh;background:
+      radial-gradient(1200px 800px at -10% -10%, rgba(127,91,255,.20), transparent 45%),
+      radial-gradient(900px 600px at 110% 10%, rgba(51,209,255,.18), transparent 40%),
+      linear-gradient(180deg,var(--bg),var(--bg2));}
+    .noise{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:18px 18px;opacity:.12}
+    .container{max-width:1100px;padding:24px 20px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}
+    .logo-badge{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 8px 24px rgba(127,91,255,.45)}
+    nav a{color:var(--muted);text-decoration:none;margin-left:16px;font-size:14px}
+    .cta{display:flex;gap:10px}
+    .btn{height:42px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:var(--text);font-weight:700;cursor:pointer}
+    .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;box-shadow:0 16px 36px rgba(127,91,255,.35)}
+
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;margin-top:30px}
+    .hero h1{font-size:clamp(34px,6vw,56px);line-height:1.05;margin:8px 0}
+    .hero p{color:var(--muted);margin:0 0 14px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(122,156,255,.14);border:1px solid rgba(122,156,255,.25);color:#dfe6ff;font-size:13px}
+    .grad-card{border:1px solid var(--border);background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+
+    .quote-card{padding:20px 18px 56px;position:relative;min-height:220px}
+    .quote-mark{font-size:48px;color:rgba(255,255,255,.18)}
+    #quote{font-size:clamp(18px,2.6vw,24px);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+    .hint{position:absolute;left:16px;bottom:14px;color:var(--muted);font-size:12px}
+
+    .hero-actions{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+    .stat{padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04)}
+    .stat strong{display:block;font-size:22px}
+    .stat small{color:var(--muted)}
+
+    .cards{margin-top:30px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{padding:18px}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .card p{margin:0;color:var(--muted);line-height:1.7;font-size:14px}
+
+    .modal-wrap{position:fixed;inset:0;background:rgba(4,10,20,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+    .modal{width:min(520px,100%);padding:22px;border-radius:16px}
+    .modal h2{margin:0 0 6px}
+    .modal p{margin:0 0 10px;color:var(--muted)}
+    textarea{width:100%;min-height:120px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--text);padding:12px;resize:vertical}
+    textarea:focus{outline:none;border-color:rgba(122,156,255,.45);box-shadow:0 0 0 4px rgba(122,156,255,.16)}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+
+    .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.95);color:#0f1530;font-weight:800;box-shadow:0 18px 40px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:.25s;z-index:30}
+    .toast.show{opacity:1}
+
+    footer{margin:36px 0 10px;color:var(--muted);font-size:12px;letter-spacing:.04em;text-align:center}
+
+    @media (max-width:980px){.hero{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="container">
+    <header>
+      <div class="logo"><div class="logo-badge"></div> LICK.DOG</div>
+      <nav>
+        <a href="/admin.html">后台</a>
+        <a href="https://github.com/oldxianyu/lick-dog-web" target="_blank">GitHub</a>
+      </nav>
+      <div class="cta">
+        <button class="btn" onclick="openModal()">投稿</button>
+        <button class="btn btn-primary" onclick="fetchQuote()">换一句</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <span class="pill">像 sufe.pro 风格的清爽着陆页</span>
+        <h1>舔狗日记 · 随机一句，
+          <br/>复制就能发</h1>
+        <p>打开即可用。点一次换一句，点卡片即可复制。你也可以匿名投稿，把你的故事留在这里。</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="copyText()">复制当前</button>
+          <button class="btn" onclick="openModal()">我要投稿</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong id="stat-a">轻操作</strong><small>无需登录即可使用</small></div>
+          <div class="stat"><strong id="stat-b">匿名投稿</strong><small>五秒提交一条</small></div>
+          <div class="stat"><strong id="stat-c">一键复制</strong><small>直接发给她/他</small></div>
+        </div>
+      </div>
+      <div class="grad-card quote-card" onclick="copyText()" title="点击复制">
+        <div class="quote-mark">“</div>
+        <div id="quote">正在从数据库加载舔狗语录...</div>
+        <div class="hint">点击卡片可复制</div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <div class="grad-card card">
+        <h3>随机抽取</h3>
+        <p>每次刷新都会换一句，来自大家的真实投稿。</p>
+      </div>
+      <div class="grad-card card">
+        <h3>复制即用</h3>
+        <p>文案不折腾，点击即可复制，发圈发群都顺手。</p>
+      </div>
+      <div class="grad-card card">
+        <h3>匿名投稿</h3>
+        <p>写下你的那一刻，交给我们帮你记住。</p>
+      </div>
+    </section>
+
+    <footer>© LICK.DOG · 一个情绪切片小站</footer>
+  </div>
+
+  <div id="modal" class="modal-wrap" onclick="if(event.target.id==='modal')closeModal()">
+    <div class="grad-card modal">
+      <h2>投稿一条新的舔狗语录</h2>
+      <p>建议 5-100 字，越像真人越有味道。</p>
+      <textarea id="submitText" placeholder="比如：你一天没回我，我还在想是不是你今天太忙了。"></textarea>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">算了</button>
+        <button class="btn btn-primary" onclick="submitQuote()">投稿</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    async function fetchQuote(){
+      const el=document.getElementById('quote');
+      el.style.opacity=.45;
+      try{
+        const res=await fetch('/api/quote');
+        const data=await res.json();
+        el.innerText=data.content;
+      }catch(e){el.innerText='网络出错了，就像我们的关系一样，一直没真正连上。'}
+      el.style.opacity=1;
+    }
+    function openModal(){document.getElementById('modal').style.display='flex'}
+    function closeModal(){document.getElementById('modal').style.display='none'}
+    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__tt);window.__tt=setTimeout(()=>t.classList.remove('show'),2000)}
+    function copyText(){const t=document.getElementById('quote').innerText;navigator.clipboard.writeText(t).then(()=>showToast('已复制'))}
+    async function submitQuote(){
+      const text=document.getElementById('submitText').value.trim();
+      if(!text)return showToast('写点东西吧，沉默是舔不到的。');
+      try{
+        const r=await fetch('/api/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:text})});
+        const d=await r.json();
+        if(r.ok){showToast(d.message||'投稿成功');document.getElementById('submitText').value='';closeModal();}
+        else showToast(d.error||'提交失败');
+      }catch(e){showToast('提交失败，可能服务器也失恋了。')}
+    }
+    fetchQuote();
+  </script>
+</body>
+</html>
