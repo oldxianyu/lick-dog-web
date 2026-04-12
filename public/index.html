@@ -25,7 +25,15 @@
       var(--bg);
     }
 
-    .container{max-width:960px;margin:0 auto;padding:24px 18px 40px}
+    /* 背景画布与鼠标光晕 */
+    .bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .cursor-glow{position:fixed;top:0;left:0;width:140px;height:140px;border-radius:50%;
+      pointer-events:none;z-index:2;mix-blend-mode:multiply;opacity:.65;
+      background: radial-gradient(60% 60% at 50% 50%, rgba(255,61,140,.35), rgba(255,106,168,.18) 60%, transparent 70%);
+      filter: blur(12px); transform: translate(-9999px,-9999px);
+    }
+
+    .container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 40px}
 
     /* 顶部（上） */
     header{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -112,6 +120,8 @@
   </style>
 </head>
 <body>
+  <canvas id="bgCanvas" class="bg-canvas"></canvas>
+  <div id="cursorGlow" class="cursor-glow"></div>
   <div class="container">
     <header>
       <div class="logo"><div class="logo-badge"></div> <span class="wordmark glow-text">LICK.DOG</span></div>
@@ -196,6 +206,63 @@
     function closeModal(){document.getElementById('modal').style.display='none'}
     function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__TT);window.__TT=setTimeout(()=>t.classList.remove('show'),2000)}
     fetchQuote();
+
+    // 鼠标发光跟随（轻量）
+    (()=>{
+      const glow=document.getElementById('cursorGlow');
+      let tx=0, ty=0, x=0, y=0, visible=false;
+      const lerp=(a,b,t)=>a+(b-a)*t;
+      const onMove=e=>{tx=e.clientX-70; ty=e.clientY-70; visible=true;};
+      const onLeave=()=>{visible=false;};
+      window.addEventListener('pointermove', onMove, {passive:true});
+      window.addEventListener('pointerleave', onLeave, {passive:true});
+      function frame(){
+        x=lerp(x,tx,.18); y=lerp(y,ty,.18);
+        glow.style.transform=`translate(${x}px,${y}px)`;
+        glow.style.opacity=visible? .65 : 0;
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+
+    // 背景粒子（柔和、低功耗）
+    ;(()=>{
+      const c=document.getElementById('bgCanvas');
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      const ctx=c.getContext('2d');
+      let w=0,h=0, parts=[], mx=-9999, my=-9999;
+      function resize(){ w=window.innerWidth; h=window.innerHeight; c.width=w*dpr; c.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+      function rand(a,b){return a+Math.random()*(b-a)}
+      function init(){
+        parts=[]; const count=Math.floor(Math.min(60, w*h/30000));
+        for(let i=0;i<count;i++){
+          parts.push({x:rand(0,w),y:rand(0,h), r:rand(12,34),
+            vx:rand(-0.2,0.2), vy:rand(-0.2,0.2),
+            base:`rgba(255, ${Math.floor(rand(90,150))}, ${Math.floor(rand(140,200))}, `});
+        }
+      }
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+        ctx.globalCompositeOperation='lighter';
+        for(const p of parts){
+          const dx=p.x-mx, dy=p.y-my; const dist=Math.hypot(dx,dy)||1;
+          const ax= dx/dist * 0.08, ay= dy/dist * 0.08; // 轻微排斥
+          if(dist<180){ p.vx += ax; p.vy += ay; }
+          p.x+=p.vx; p.y+=p.vy; p.vx*=0.995; p.vy*=0.995;
+          if(p.x<-50) p.x=w+50; if(p.x>w+50) p.x=-50; if(p.y<-50) p.y=h+50; if(p.y>h+50) p.y=-50;
+          const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+          grad.addColorStop(0, p.base+'0.25)');
+          grad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        }
+        ctx.globalCompositeOperation='source-over';
+        requestAnimationFrame(draw);
+      }
+      resize(); init(); draw();
+      window.addEventListener('resize', ()=>{resize(); init();});
+      window.addEventListener('pointermove', e=>{mx=e.clientX; my=e.clientY;}, {passive:true});
+      window.addEventListener('pointerleave', ()=>{mx=-9999; my=-9999;}, {passive:true});
+    })();
   </script>
 </body>
 </html>
