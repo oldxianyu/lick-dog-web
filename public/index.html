@@ -117,6 +117,18 @@
     .btn-primary:hover::after{ opacity: .85; }
 
     .quote-card:hover{ box-shadow: 0 14px 36px rgba(255,61,140,.18), var(--shadow); }
+    /* SoundCode 风格按钮 */
+    .btn-sound{position:relative;display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 18px;border-radius:14px;border:none;background:transparent;color:var(--text);font-weight:900;letter-spacing:.02em;cursor:pointer;transition:transform .15s ease}
+    .btn-sound:active{transform:translateY(1px)}
+    .btn-sound::before{content:"";position:absolute;inset:0;border-radius:14px;padding:2px;background:linear-gradient(120deg,var(--primary),var(--primary2),#7f5bff,var(--primary));background-size:300% 300%;animation:btnFlow 3.2s linear infinite;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+    .btn-sound::after{content:"";position:absolute;inset:2px;border-radius:12px;background:#fff;opacity:.92}
+    .btn-sound > span{position:relative;z-index:1}
+
+    .btn-sound-primary{color:#fff}
+    .btn-sound-primary::after{background:linear-gradient(135deg,var(--primary),var(--primary2))}
+    .btn-sound-primary::before{filter:blur(8px);opacity:.9}
+
+    @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
   </style>
 </head>
 <body>
@@ -140,8 +152,8 @@
       </div>
 
       <div class="actions">
-        <button class="btn btn-primary" onclick="copyText()">复制当前</button>
-        <button class="btn" onclick="openModal()">我要投稿</button>
+        <button class="btn-sound btn-sound-primary" onclick="copyText()"><span>复制当前</span></button>
+        <button class="btn-sound" onclick="openModal()"><span>我要投稿</span></button>
       </div>
 
       <div class="features">
