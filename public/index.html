@@ -156,6 +156,17 @@
     .btn-sound-primary::after{background:linear-gradient(135deg,var(--primary),var(--primary2))}
     .btn-sound-primary::before{filter:blur(6px);opacity:.9}
 
+    /* 搭配款：描边为主（透明内胆） */
+    .btn-sound-outline{color:var(--primary)}
+    .btn-sound-outline::after{background:rgba(255,255,255,.04)}
+    .btn-sound-outline::before{opacity:.7;filter:blur(6px)}
+
+    /* 搭配款：柔和白内胆（无扫光） */
+    .btn-sound-soft{color:var(--text)}
+    .btn-sound-soft .shine{display:none}
+    .btn-sound-soft::after{background:#fff;opacity:.92}
+    .btn-sound-soft::before{opacity:.5;filter:blur(4px)}
+
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
     @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
   </style>
@@ -181,11 +192,11 @@
       </div>
 
       <div class="actions">
-        <!-- 3 扫光：复制当前 -->
-        <button class="btn-sound btn-sound-primary" onclick="copyText()"><span class="shine"></span><span>复制当前</span></button>
-        <!-- 1 极简：我的投稿（无扫光） -->
-        <button class="btn-sound" onclick="openModal()"><span>我的投稿</span></button>
-        <!-- 3 扫光：换一个舔（刷新文案） -->
+        <!-- 搭配：描边款（复制当前） -->
+        <button class="btn-sound btn-sound-outline" onclick="copyText()"><span>复制当前</span></button>
+        <!-- 搭配：柔和白内胆（我的投稿） -->
+        <button class="btn-sound btn-sound-soft" onclick="openModal()"><span>我的投稿</span></button>
+        <!-- 主色填充 + 扫光（换一个舔） -->
         <button class="btn-sound btn-sound-primary" onclick="fetchQuote()"><span class="shine"></span><span>换一个舔</span></button>
       </div>
 
