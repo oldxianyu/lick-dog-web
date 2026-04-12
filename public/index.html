@@ -70,12 +70,51 @@
     .toast.show{opacity:1}
 
     @media (max-width:780px){.features{grid-template-columns:1fr}}
+
+    /* Uiverse-like neon glow for wordmark and buttons */
+    .glow-text{
+      color: var(--primary);
+      text-shadow:
+        0 0 6px rgba(255,61,140,.55),
+        0 0 12px rgba(255,61,140,.45),
+        0 0 22px rgba(255,61,140,.35);
+      animation: glowPulse 2.6s ease-in-out infinite;
+      letter-spacing: .04em;
+    }
+    @keyframes glowPulse{
+      0%,100%{ text-shadow:
+        0 0 6px rgba(255,61,140,.55),
+        0 0 12px rgba(255,61,140,.45),
+        0 0 22px rgba(255,61,140,.35);
+      }
+      50%{ text-shadow:
+        0 0 10px rgba(255,61,140,.75),
+        0 0 24px rgba(255,61,140,.55),
+        0 0 40px rgba(255,61,140,.45);
+      }
+    }
+
+    .btn-primary{ position: relative; }
+    .btn-primary::after{
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: radial-gradient(60% 60% at 50% 50%, rgba(255,61,140,.45), transparent 60%);
+      filter: blur(12px);
+      opacity: 0;
+      transition: opacity .2s ease;
+      z-index: -1;
+    }
+    .btn-primary:hover::after{ opacity: .85; }
+
+    .quote-card:hover{ box-shadow: 0 14px 36px rgba(255,61,140,.18), var(--shadow); }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo"><div class="logo-badge"></div> LICK.DOG</div>
+      <div class="logo"><div class="logo-badge"></div> <span class="wordmark glow-text">LICK.DOG</span></div>
       <nav>
         <a href="/admin.html">后台</a>
         <a href="https://github.com/oldxianyu/lick-dog-web" target="_blank">GitHub</a>
