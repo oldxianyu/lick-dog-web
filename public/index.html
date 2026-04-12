@@ -125,21 +125,13 @@
   <div class="container">
     <header>
       <div class="logo"><div class="logo-badge"></div> <span class="wordmark glow-text">LICK.DOG</span></div>
-      <nav>
-        <a href="/admin.html">后台</a>
-        <a href="https://github.com/oldxianyu/lick-dog-web" target="_blank">GitHub</a>
-      </nav>
-      <div>
-        <button class="btn" onclick="openModal()">投稿</button>
-        <button class="btn btn-primary" onclick="fetchQuote()">换一句</button>
-      </div>
+      <!-- 顶部导航移除（按要求去掉“后台 GitHub”文字） -->
+      <div></div>
     </header>
 
     <section class="hero">
-      <span class="pill">品红系 · 上下结构</span>
-      <h1>舔狗日记
-        <br/>随机一句，一键复制</h1>
-      <p class="sub">打开即可使用：点一次“换一句”，点击卡片即可复制。也欢迎你匿名投稿，把你的故事交给这里保管。</p>
+      <!-- 移除标签与副标题，改为居中品牌字样 -->
+      <h1 class="wordmark glow-text" style="font-size:clamp(44px,8vw,86px);margin-top:6px;">LICK.DOG</h1>
 
       <div class="quote-card" onclick="copyText()" title="点击复制">
         <div class="quote-mark">“</div>
@@ -159,7 +151,7 @@
       </div>
     </section>
 
-    <footer>© LICK.DOG · 情绪切片小站 · 品红主题</footer>
+
   </div>
 
   <!-- 投稿弹窗 -->
