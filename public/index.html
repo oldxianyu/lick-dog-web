@@ -45,7 +45,7 @@
       filter: blur(20px); transform: translate(-9999px,-9999px);
     }
 
-    .container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 120px} /* 预留底部空间给悬浮按钮 */
+    .container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 40px}
 
     /* 顶部（上） */
     header{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -67,7 +67,7 @@
     #quote{font-size:clamp(18px,2.4vw,24px);line-height:1.8;white-space:pre-wrap;word-break:break-word}
     .hint{position:absolute;left:18px;bottom:14px;font-size:12px;color:#a78da1}
 
-    .actions{display:none} /* 顶部动作区隐藏，改用底部心形按钮 */
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 
     .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
     .feature{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 14px;box-shadow:0 8px 20px rgba(255,61,140,.08)}
@@ -181,19 +181,6 @@
 
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
     @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
-
-    /* 底部心形按钮条 */
-    .bottom-actions{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:16px;z-index:20}
-    .heart-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:transparent;border:none;cursor:pointer;padding:0}
-    .heart-svg{width:64px;height:64px;filter:drop-shadow(0 10px 22px rgba(255,61,140,.22))}
-    .heart-label{font-weight:900;color:#7a6c84;font-size:13px}
-    .heart-accent .heart-svg path{fill:url(#gradAccent)}
-    .heart-primary .heart-svg path{fill:url(#gradPrimary)}
-    .heartbeat{animation:heartbeat 1.6s ease-in-out infinite}
-    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.12)}28%{transform:scale(1)}42%{transform:scale(1.08)}}
-
-    @media (max-width:780px){ .heart-svg{width:58px;height:58px} .heart-label{font-size:12px} }
-
   </style>
 </head>
 <body>
@@ -231,34 +218,6 @@
         <div class="feature"><h3>一键复制</h3><p>复制后即可转发</p></div>
       </div>
     </section>
-
-    <!-- 底部两个心形按钮：我要帮舔 / 换一个舔 -->
-    <div class="bottom-actions">
-      <button class="heart-btn heart-accent" onclick="openModal()" aria-label="我要帮舔">
-        <svg class="heart-svg heartbeat" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="gradAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ffecf4"/>
-              <stop offset="100%" stop-color="#ffd9e8"/>
-            </linearGradient>
-          </defs>
-          <path d="M12 21s-7.5-4.65-10-9.4C.2 8.3 1.4 5.5 4 4.9c1.7-.4 3.6.4 4.6 1.9 1-1.5 2.9-2.3 4.6-1.9 2.6.6 3.8 3.4 2 6.7-2.5 4.75-10 9.4-10 9.4z"/>
-        </svg>
-        <span class="heart-label">我要帮舔</span>
-      </button>
-      <button class="heart-btn heart-primary" onclick="fetchQuote()" aria-label="换一个舔">
-        <svg class="heart-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="gradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ff3d8c"/>
-              <stop offset="100%" stop-color="#ff6aa8"/>
-            </linearGradient>
-          </defs>
-          <path d="M12 21s-7.5-4.65-10-9.4C.2 8.3 1.4 5.5 4 4.9c1.7-.4 3.6.4 4.6 1.9 1-1.5 2.9-2.3 4.6-1.9 2.6.6 3.8 3.4 2 6.7-2.5 4.75-10 9.4-10 9.4z"/>
-        </svg>
-        <span class="heart-label">换一个舔</span>
-      </button>
-    </div>
 
 
   </div>
