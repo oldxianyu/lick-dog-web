@@ -1,85 +1,357 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>舔狗总司令部 - 全权管控</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LICK.DOG Admin</title>
     <style>
-        body { background: #1a1a1a; color: #fff; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #ff4757; text-align: center; }
-        
-        /* 登录框 */
-        #login-panel { text-align: center; margin-top: 100px; }
-        input { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
-        button { padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-login { background: #ff4757; color: white; }
-        .btn-login:hover { background: #ff6b81; }
-
-        /* 列表区域 */
-        #dashboard { display: none; }
-        
-        /* 单条语录样式 */
-        .quote-item { 
-            background: #2d2d2d; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-radius: 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-left: 5px solid #555; /* 默认灰色边框 */
-            transition: 0.3s;
+        :root {
+            --bg: #07111f;
+            --bg-2: #0c1a2c;
+            --card: rgba(12, 24, 40, 0.84);
+            --card-2: rgba(15, 30, 50, 0.92);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #eef4ff;
+            --muted: #98a9c3;
+            --primary: #ff5d7a;
+            --success: #48d597;
+            --danger: #ff7a7a;
+            --shadow: 0 24px 80px rgba(0,0,0,0.38);
         }
 
-        /* 状态：已发布 (高亮) */
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(255, 93, 122, 0.16), transparent 28%),
+                radial-gradient(circle at top right, rgba(72, 213, 151, 0.1), transparent 26%),
+                linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+        }
+
+        .page {
+            width: min(1100px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 28px 0 40px;
+        }
+
+        .panel {
+            border-radius: 26px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: var(--shadow);
+        }
+
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .login-card {
+            width: min(480px, 100%);
+            padding: 28px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 93, 122, 0.12);
+            border: 1px solid rgba(255, 93, 122, 0.2);
+            color: #ffd7df;
+            font-size: 13px;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        h1 {
+            margin: 16px 0 8px;
+            font-size: clamp(30px, 6vw, 42px);
+            letter-spacing: -0.04em;
+        }
+
+        .muted {
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        input {
+            width: 100%;
+            height: 50px;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(255, 93, 122, 0.35);
+            box-shadow: 0 0 0 4px rgba(255, 93, 122, 0.12);
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all .2s ease;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-danger {
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 999px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, #ff5d7a, #ff7a92);
+            box-shadow: 0 12px 28px rgba(255, 93, 122, 0.24);
+        }
+
+        .btn-secondary {
+            color: var(--text);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-danger {
+            color: #fff;
+            background: linear-gradient(135deg, #ff7a7a, #ff6262);
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover,
+        .btn-danger:hover { transform: translateY(-1px); }
+
+        .dashboard { display: none; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 22px 24px;
+        }
+
+        .topbar h2 {
+            margin: 6px 0 0;
+            font-size: 28px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: var(--muted);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .summary-card {
+            padding: 20px;
+        }
+
+        .summary-card strong {
+            display: block;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card small { color: var(--muted); }
+
+        .list-card { padding: 18px; }
+
+        .list-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .list-head h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .list-head span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        #list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .quote-item {
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
         .status-active {
-            border-left-color: #2ecc71; /* 绿色边框 */
-            background: #333;
+            box-shadow: inset 3px 0 0 var(--success);
         }
-        .status-active .content-text { color: #fff; }
 
-        /* 状态：已隐藏 (变暗) */
         .status-hidden {
-            border-left-color: #e74c3c; /* 红色边框 */
-            background: #222;
-            opacity: 0.6;
+            opacity: 0.72;
+            box-shadow: inset 3px 0 0 var(--danger);
         }
-        .status-hidden .content-text { color: #888; text-decoration: line-through; }
 
-        /* 按钮组 */
-        .actions { display: flex; gap: 10px; }
-        .btn-approve { background: #2ecc71; color: #fff; }
-        .btn-delete { background: #e74c3c; color: #fff; }
-        .btn-approve:hover { background: #27ae60; }
-        .btn-delete:hover { background: #c0392b; }
-        
-        /* 状态标签 */
-        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
-        .badge-live { background: #2ecc71; color: #000; }
-        .badge-dead { background: #555; color: #ccc; }
+        .status-hidden .content-text {
+            color: #8fa0bb;
+            text-decoration: line-through;
+        }
 
-        .timestamp { font-size: 0.8rem; color: #666; display: block; margin-bottom: 5px; }
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-live {
+            background: rgba(72, 213, 151, 0.16);
+            color: #7bf0ba;
+        }
+
+        .badge-dead {
+            background: rgba(255, 122, 122, 0.12);
+            color: #ff9d9d;
+        }
+
+        .timestamp {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .content-text {
+            font-size: 16px;
+            line-height: 1.75;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 32px 12px;
+        }
+
+        @media (max-width: 820px) {
+            .summary { grid-template-columns: 1fr; }
+            .topbar,
+            .quote-item { flex-direction: column; }
+            .toolbar,
+            .actions { width: 100%; }
+            .actions button,
+            .toolbar button { width: 100%; }
+        }
     </style>
 </head>
 <body>
-
-    <div id="login-panel">
-        <h1>👮 舔狗纠察队登录</h1>
-        <input type="text" id="username" placeholder="用户名 (舔狗？)">
-        <input type="password" id="password" placeholder="密码 (lickdog?)">
-        <br><br>
-        <button class="btn-login" onclick="login()">登录</button>
+    <div id="login-panel" class="login-wrap">
+        <div class="panel login-card">
+            <div class="eyebrow">LICK.DOG 内部管控台</div>
+            <h1>管理后台登录</h1>
+            <p class="muted">这里用于审核、隐藏、恢复站内语录。前台负责发疯，后台负责收口。</p>
+            <div class="form-grid">
+                <input type="text" id="username" placeholder="用户名" />
+                <input type="password" id="password" placeholder="密码" />
+                <button class="btn-primary" onclick="login()">登录后台</button>
+            </div>
+        </div>
     </div>
 
-    <div id="dashboard">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>🎛️ 状态控制台</h1>
-            <button onclick="logout()" style="background:#555; color:#fff;">退出</button>
+    <div id="dashboard" class="dashboard page">
+        <div style="width:100%;">
+            <div class="panel topbar">
+                <div>
+                    <div class="eyebrow">内容状态总览</div>
+                    <h2>舔狗总司令部</h2>
+                    <p>审核投稿、控制展示状态、维护前台的整体气质。</p>
+                </div>
+                <div class="toolbar">
+                    <button class="btn-secondary" onclick="loadQuotes()">刷新列表</button>
+                    <button class="btn-secondary" onclick="logout()">退出登录</button>
+                </div>
+            </div>
+
+            <div class="summary" id="summary">
+                <div class="panel summary-card"><strong id="stat-total">0</strong><small>总语录数</small></div>
+                <div class="panel summary-card"><strong id="stat-live">0</strong><small>展示中</small></div>
+                <div class="panel summary-card"><strong id="stat-hidden">0</strong><small>已隐藏</small></div>
+            </div>
+
+            <div class="panel list-card">
+                <div class="list-head">
+                    <h3>语录列表</h3>
+                    <span>绿色为展示中，红色为已隐藏</span>
+                </div>
+                <div id="list">正在加载...</div>
+            </div>
         </div>
-        <p style="color:#888; text-align:center; font-size:0.9rem;">
-            🟢 绿色 = 线上显示中 | 🔴 红色/划线 = 已下架/隐藏
-        </p>
-        <div id="list">正在加载...</div>
     </div>
 
     <script>
@@ -91,14 +363,16 @@
             const p = document.getElementById('password').value;
             const res = await fetch('/api/login', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: u, password: p })
             });
             const data = await res.json();
             if (data.success) {
                 localStorage.setItem('lick_token', data.token);
                 showDashboard();
-            } else { alert(data.error); }
+            } else {
+                alert(data.error || '登录失败');
+            }
         }
 
         function showDashboard() {
@@ -109,36 +383,45 @@
 
         async function loadQuotes() {
             const res = await fetch('/api/admin', {
-                headers: { 'Authorization': localStorage.getItem('lick_token') }
+                headers: { Authorization: localStorage.getItem('lick_token') }
             });
-            if(res.status === 401) { logout(); return; }
-            
+            if (res.status === 401) {
+                logout();
+                return;
+            }
+
             const quotes = await res.json();
             const list = document.getElementById('list');
-            list.innerHTML = quotes.length ? '' : '<p style="text-align:center; color:#666">暂无数据。</p>';
+            const total = quotes.length;
+            const live = quotes.filter(q => q.is_approved === 1).length;
+            const hidden = total - live;
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-live').innerText = live;
+            document.getElementById('stat-hidden').innerText = hidden;
+
+            list.innerHTML = quotes.length ? '' : '<div class="empty">暂无数据。</div>';
 
             quotes.forEach(q => {
                 const div = document.createElement('div');
-                // 根据 is_approved 状态给不同的 CSS 类名
-                const isLive = (q.is_approved === 1);
+                const isLive = q.is_approved === 1;
                 div.className = `quote-item ${isLive ? 'status-active' : 'status-hidden'}`;
-                
                 const time = q.created_at ? new Date(q.created_at).toLocaleString() : '未知时间';
-                const statusBadge = isLive 
-                    ? `<span class="badge badge-live">展示中</span>` 
-                    : `<span class="badge badge-dead">已隐藏</span>`;
+                const statusBadge = isLive
+                    ? '<span class="badge badge-live">展示中</span>'
+                    : '<span class="badge badge-dead">已隐藏</span>';
 
                 div.innerHTML = `
-                    <div style="flex:1; margin-right:20px;">
-                        <span class="timestamp">${time}</span>
-                        ${statusBadge}
-                        <span class="content-text">${q.content}</span>
+                    <div style="flex:1; min-width:0;">
+                        <div class="meta">
+                            ${statusBadge}
+                            <span class="timestamp">${time}</span>
+                        </div>
+                        <div class="content-text">${q.content}</div>
                     </div>
                     <div class="actions">
-                        ${isLive 
-                            ? `<button class="btn-delete" onclick="toggleStatus(${q.id}, 'delete')">隐藏</button>` 
-                            : `<button class="btn-approve" onclick="toggleStatus(${q.id}, 'approve')">恢复</button>`
-                        }
+                        ${isLive
+                            ? `<button class="btn-danger" onclick="toggleStatus(${q.id}, 'delete')">隐藏</button>`
+                            : `<button class="btn-primary" onclick="toggleStatus(${q.id}, 'approve')">恢复</button>`}
                     </div>
                 `;
                 list.appendChild(div);
@@ -146,20 +429,15 @@
         }
 
         async function toggleStatus(id, action) {
-            // 如果是隐藏操作，不需要那么重的确认，轻微确认即可，或者直接操作也行
-            // 这里为了防止手滑，还是保留确认
-            /* if (action === 'delete' && !confirm('确定要隐藏这条吗？')) return;
-            */
-           
             await fetch('/api/admin', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('lick_token')
+                    Authorization: localStorage.getItem('lick_token')
                 },
                 body: JSON.stringify({ id, action })
             });
-            loadQuotes(); // 刷新列表，看到状态变化
+            loadQuotes();
         }
 
         function logout() {

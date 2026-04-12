@@ -1,76 +1,495 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LICK.DOG - 舔狗日记</title>
     <style>
-        :root { --primary: #ff4757; --bg: #1a1a1a; --card: #2d2d2d; --text: #e0e0e0; }
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg); color: var(--text); font-family: 'PingFang SC', sans-serif; overflow: hidden; }
-        .container { text-align: center; max-width: 600px; width: 90%; padding: 20px; position: relative; z-index: 1; }
-        h1 { font-size: 3rem; margin-bottom: 5px; font-weight: 900; color: var(--primary); text-shadow: 2px 2px 0px #fff; letter-spacing: -2px; }
-        .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 40px; font-family: monospace; }
-        .content-box { background: var(--card); padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-        .content-box:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 71, 87, 0.2); }
-        .content-box:active { transform: scale(0.98); }
-        #quote { font-size: 1.3rem; line-height: 1.6; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-        .tip { position: absolute; bottom: 10px; right: 20px; font-size: 0.7rem; color: #555; opacity: 0.5; }
-        .btn-group { margin-top: 40px; display: flex; gap: 20px; justify-content: center; }
-        .btn { padding: 12px 30px; border: none; font-size: 1rem; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-refresh { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3); }
-        .btn-refresh:hover { background: #ff6b81; transform: translateY(-2px); }
-        .btn-submit { background: transparent; border: 2px solid #444; color: #888; }
-        .btn-submit:hover { border-color: var(--primary); color: var(--primary); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
-        .modal { background: var(--card); padding: 30px; border-radius: 15px; width: 80%; max-width: 400px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.7); border: 1px solid #333; }
-        .modal h2 { margin-top: 0; color: var(--primary); }
-        textarea { width: 100%; height: 100px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; margin: 15px 0; font-family: inherit; font-size: 1rem; }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.9); color: #000; padding: 10px 20px; border-radius: 50px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+        :root {
+            --bg: #07111f;
+            --bg-2: #0c1a2c;
+            --card: rgba(12, 24, 40, 0.78);
+            --card-strong: rgba(14, 28, 48, 0.92);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #eef4ff;
+            --muted: #97a8c2;
+            --primary: #ff5d7a;
+            --primary-2: #ff7d96;
+            --accent: #6ae3ff;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(255, 93, 122, 0.18), transparent 32%),
+                radial-gradient(circle at top right, rgba(106, 227, 255, 0.14), transparent 28%),
+                linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+            overflow-x: hidden;
+        }
+
+        .noise,
+        .glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .glow::before,
+        .glow::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(90px);
+            opacity: 0.45;
+        }
+
+        .glow::before {
+            width: 280px;
+            height: 280px;
+            background: rgba(255, 93, 122, 0.2);
+            top: 8%;
+            left: 6%;
+        }
+
+        .glow::after {
+            width: 260px;
+            height: 260px;
+            background: rgba(106, 227, 255, 0.14);
+            right: 8%;
+            bottom: 10%;
+        }
+
+        .noise {
+            background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 18px 18px;
+            opacity: 0.16;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .shell {
+            width: min(960px, 100%);
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .panel,
+        .side-card,
+        .modal {
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: var(--shadow);
+        }
+
+        .panel {
+            border-radius: 28px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: #ffd7df;
+            background: rgba(255, 93, 122, 0.12);
+            border: 1px solid rgba(255, 93, 122, 0.2);
+        }
+
+        .badge::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 12px rgba(255, 93, 122, 0.8);
+        }
+
+        h1 {
+            margin: 18px 0 8px;
+            font-size: clamp(42px, 7vw, 68px);
+            line-height: 0.96;
+            letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+            max-width: 38em;
+        }
+
+        .quote-card {
+            margin-top: 28px;
+            padding: 28px 24px 56px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+            position: relative;
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quote-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 93, 122, 0.32);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+        }
+
+        .quote-mark {
+            font-size: 54px;
+            line-height: 1;
+            color: rgba(255,255,255,0.14);
+            margin-bottom: 8px;
+        }
+
+        #quote {
+            font-size: clamp(22px, 3.2vw, 30px);
+            line-height: 1.65;
+            letter-spacing: 0.01em;
+            transition: opacity .2s ease;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .quote-tip {
+            position: absolute;
+            left: 24px;
+            bottom: 18px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .btn {
+            height: 50px;
+            padding: 0 22px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .22s ease;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            box-shadow: 0 14px 30px rgba(255, 93, 122, 0.26);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); }
+
+        .btn-secondary {
+            color: var(--text);
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.09);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(106, 227, 255, 0.28);
+            color: #dff9ff;
+        }
+
+        .aside {
+            display: grid;
+            gap: 18px;
+        }
+
+        .side-card {
+            border-radius: 24px;
+            padding: 22px;
+        }
+
+        .side-title {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .side-desc {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 14px;
+        }
+
+        .feature-list,
+        .mini-list {
+            list-style: none;
+            padding: 0;
+            margin: 18px 0 0;
+        }
+
+        .feature-list li,
+        .mini-list li {
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #e7f0ff;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .feature-list li:first-child,
+        .mini-list li:first-child { border-top: none; }
+
+        .feature-list span,
+        .mini-list span { color: var(--muted); }
+
+        .mini-stat {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .stat-box {
+            border-radius: 18px;
+            padding: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .stat-box small { color: var(--muted); }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 10, 20, 0.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            padding: 18px;
+        }
+
+        .modal {
+            width: min(520px, 100%);
+            border-radius: 24px;
+            padding: 26px;
+            background: var(--card-strong);
+        }
+
+        .modal h2 {
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        .modal p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            margin-top: 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.7;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(255, 93, 122, 0.4);
+            box-shadow: 0 0 0 4px rgba(255, 93, 122, 0.12);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        #toast {
+            position: fixed;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 180px;
+            text-align: center;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.94);
+            color: #0f1724;
+            font-weight: 700;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.24);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+            z-index: 30;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .footer-note {
+            margin-top: 16px;
+            color: rgba(151, 168, 194, 0.8);
+            font-size: 12px;
+            letter-spacing: .04em;
+        }
+
+        @media (max-width: 920px) {
+            .shell { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .page { padding: 18px 12px; }
+            .panel, .side-card, .modal { border-radius: 22px; }
+            .panel { padding: 20px; }
+            .quote-card { min-height: 220px; padding: 22px 18px 52px; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; }
+            .mini-stat { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LICK.DOG</h1>
-        <div class="subtitle">你认为的舔狗语录只是我的日常</div>
-        <div class="content-box" onclick="copyText()" title="点击复制">
-            <div id="quote">正在从数据库加载舔狗语录...</div>
-            <div class="tip">点击文字复制</div>
-        </div>
-        <div class="btn-group">
-            <button class="btn btn-refresh" onclick="fetchQuote()">换一句舔</button>
-            <button class="btn btn-submit" onclick="openModal()">我也要帮舔</button>
+    <div class="glow"></div>
+    <div class="noise"></div>
+
+    <div class="page">
+        <div class="shell">
+            <section class="panel">
+                <div class="badge">今日情绪稳定输出中</div>
+                <h1>LICK.DOG</h1>
+                <p class="subtitle">
+                    一个专门收藏舔狗文学的小站。点一下，随机抽一句；喜欢就复制，不服也可以自己投稿。
+                </p>
+
+                <div class="quote-card" onclick="copyText()" title="点击复制这一句">
+                    <div class="quote-mark">“</div>
+                    <div id="quote">正在从数据库加载舔狗语录...</div>
+                    <div class="quote-tip">点击这张卡片可直接复制</div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="fetchQuote()">换一句舔</button>
+                    <button class="btn btn-secondary" onclick="openModal()">我也要帮舔</button>
+                </div>
+
+                <div class="footer-note">有些话不一定该发给她，但可以先留在这里。</div>
+            </section>
+
+            <aside class="aside">
+                <section class="side-card">
+                    <h3 class="side-title">怎么玩</h3>
+                    <p class="side-desc">这个站不复杂，核心就三件事：抽一句、复制一句、投稿一句。</p>
+                    <ul class="feature-list">
+                        <li><strong>随机抽取</strong><span>每次刷新都会从库里换一句</span></li>
+                        <li><strong>点击即复制</strong><span>适合直接转发或保存</span></li>
+                        <li><strong>匿名投稿</strong><span>把你的卑微时刻也贡献进来</span></li>
+                    </ul>
+                </section>
+
+                <section class="side-card">
+                    <h3 class="side-title">站点气质</h3>
+                    <p class="side-desc">不是鸡汤，不是文案模板，就是一些真情实感过了头的人类切片。</p>
+                    <div class="mini-stat">
+                        <div class="stat-box">
+                            <strong>暗黑风</strong>
+                            <small>更像深夜情绪站</small>
+                        </div>
+                        <div class="stat-box">
+                            <strong>轻操作</strong>
+                            <small>打开就能用</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="side-card">
+                    <h3 class="side-title">适合什么场景</h3>
+                    <ul class="mini-list">
+                        <li><strong>朋友圈文案</strong><span>发疯前先挑一句</span></li>
+                        <li><strong>整活截图</strong><span>复制后直接发群</span></li>
+                        <li><strong>投稿共创</strong><span>把你的故事丢进库里</span></li>
+                    </ul>
+                </section>
+            </aside>
         </div>
     </div>
+
     <div class="modal-overlay" id="modal">
         <div class="modal">
-            <h2>📝 贡献语录</h2>
-            <p style="color:#888; font-size:0.9rem;">请写下你最卑微的那一刻 (5-100字)</p>
-            <textarea id="submitText" placeholder="宝，你今天..."></textarea>
+            <h2>投稿一条新的舔狗语录</h2>
+            <p>写下你最卑微、最真诚、最不值钱的那一刻。建议 5-100 字，越像真人越有味道。</p>
+            <textarea id="submitText" placeholder="比如：你一天没回我，我还在想是不是你今天太忙了。"></textarea>
             <div class="modal-actions">
-                <button class="btn btn-submit" style="padding: 8px 20px; font-size: 0.9rem;" onclick="closeModal()">算了</button>
-                <button class="btn btn-refresh" style="padding: 8px 20px; font-size: 0.9rem;" onclick="submitQuote()">投稿</button>
+                <button class="btn btn-secondary" onclick="closeModal()">算了</button>
+                <button class="btn btn-primary" onclick="submitQuote()">投稿</button>
             </div>
         </div>
     </div>
-    <div id="toast">复制成功</div>
+
+    <div id="toast"></div>
+
     <script>
         async function fetchQuote() {
             const quoteBox = document.getElementById('quote');
-            quoteBox.style.opacity = 0.5;
+            quoteBox.style.opacity = 0.45;
             try {
                 const res = await fetch('/api/quote');
                 const data = await res.json();
                 quoteBox.innerText = data.content;
             } catch (e) {
-                quoteBox.innerText = "网络出错了，就像我们的爱情一样断断续续。";
+                quoteBox.innerText = '网络出错了，就像我们的关系一样，一直没真正连上。';
             }
             quoteBox.style.opacity = 1;
         }
+
         async function submitQuote() {
             const text = document.getElementById('submitText').value.trim();
-            if(!text) return showToast("写点东西吧，沉默是舔不到的。");
+            if (!text) return showToast('写点东西吧，沉默是舔不到的。');
             try {
                 const res = await fetch('/api/quote', {
                     method: 'POST',
@@ -78,31 +497,47 @@
                     body: JSON.stringify({ content: text })
                 });
                 const data = await res.json();
-                if(res.ok) {
-                    showToast(data.message);
+                if (res.ok) {
+                    showToast(data.message || '投稿成功');
                     document.getElementById('submitText').value = '';
                     closeModal();
                 } else {
-                    showToast(data.error);
+                    showToast(data.error || '提交失败');
                 }
             } catch (e) {
-                showToast("提交失败，可能服务器也失恋了。");
+                showToast('提交失败，可能服务器也失恋了。');
             }
         }
+
         function copyText() {
             const text = document.getElementById('quote').innerText;
-            navigator.clipboard.writeText(text).then(() => showToast("复制成功，快发给她！"));
+            navigator.clipboard.writeText(text).then(
+                () => showToast('复制成功，快发给她。'),
+                () => showToast('复制失败，可能浏览器不想帮你。')
+            );
         }
-        function openModal() { document.getElementById('modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function openModal() {
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.style.opacity = 1;
-            setTimeout(() => t.style.opacity = 0, 2000);
+            t.classList.add('show');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
         }
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+
         fetchQuote();
     </script>
 </body>
-
 </html>
