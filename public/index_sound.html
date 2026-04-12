@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LICK.DOG · 声波风格着陆页</title>
+  <meta name="description" content="舔狗日记 · 随机一句 · 一键复制 · 匿名投稿" />
+  <style>
+    :root{
+      --bg:#0d0a12;          /* 深底 */
+      --text:#f2ecff;        /* 正文 */
+      --muted:#a9a1b4;       /* 次要文字 */
+      --primary:#ff3d8c;     /* 品红主色 */
+      --primary2:#a96bff;    /* 品红-紫 过渡 */
+      --card:rgba(22,18,32,.55);
+      --border:rgba(255,255,255,.08);
+      --shadow:0 24px 80px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;background:var(--bg);overflow-x:hidden}
+
+    /* 背景动态渐变带（低功耗） */
+    .bg-grad{position:fixed;inset:-20%;z-index:0;filter:blur(40px);opacity:.6;pointer-events:none;background:
+      radial-gradient(40% 40% at 20% 20%, rgba(255,61,140,.35), transparent 60%),
+      radial-gradient(36% 36% at 80% 30%, rgba(169,107,255,.28), transparent 60%),
+      radial-gradient(30% 30% at 50% 80%, rgba(255,61,140,.24), transparent 65%);
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+    @keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(4%, -3%, 0) scale(1.06)}}
+
+    /* 霓虹发光字 */
+    .wordmark{font-weight:900;letter-spacing:.04em;color:#fff;text-shadow:
+      0 0 6px rgba(255,61,140,.55),0 0 14px rgba(169,107,255,.55),0 0 34px rgba(255,61,140,.35)}
+
+    /* 帧：容器与卡片 */
+    .container{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:24px 18px 48px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-badge{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 210deg, var(--primary), var(--primary2), var(--primary));box-shadow:0 10px 32px rgba(255,61,140,.35)}
+    nav a{color:var(--muted);text-decoration:none;margin-left:14px;font-size:14px}
+    .btn{height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;font-weight:800;cursor:pointer;backdrop-filter:blur(6px)}
+    .btn-primary{border:none;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 16px 36px rgba(255,61,140,.36)}
+
+    .hero{margin-top:26px;text-align:center}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:#ffd1e7;font-weight:800;font-size:12px;backdrop-filter:blur(4px)}
+    .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--primary)}
+    h1{margin:12px auto 8px;font-size:clamp(36px,6.6vw,64px);line-height:1.04;letter-spacing:-.02em}
+    .sub{margin:0 auto;color:var(--muted);max-width:46rem;line-height:1.85}
+
+    .panel{max-width:860px;margin:20px auto 0;background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .panel-inner{padding:26px 20px 56px}
+    .quote-mark{font-size:46px;color:rgba(255,255,255,.16)}
+    #quote{font-size:clamp(18px,2.6vw,24px);line-height:1.8;white-space:pre-wrap;word-break:break-word}
+    .hint{position:absolute;left:18px;bottom:14px;font-size:12px;color:#cab8d1}
+
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+
+    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
+    .feature{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:14px;padding:16px 14px;backdrop-filter:blur(6px)}
+    .feature h3{margin:0 0 6px;font-size:16px}
+    .feature p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+
+    footer{margin:28px 0 6px;text-align:center;color:#b9aec6;font-size:12px}
+
+    /* 声波画布 */
+    .waves{position:absolute;left:0;right:0;bottom:0;height:120px}
+
+    /* 鼠标拖尾点阵 */
+    .trail{position:fixed;inset:0;pointer-events:none;z-index:3}
+    .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.35));box-shadow:0 0 10px rgba(255,61,140,.65);opacity:.0;transform:translate(-9999px,-9999px)}
+  </style>
+</head>
+<body>
+  <div class="bg-grad"></div>
+  <div class="container">
+    <header>
+      <div class="logo"><div class="logo-badge"></div> <span class="wordmark">LICK.DOG</span></div>
+      <nav>
+        <a href="/admin.html">后台</a>
+        <a href="https://github.com/oldxianyu/lick-dog-web" target="_blank">GitHub</a>
+      </nav>
+      <div>
+        <button class="btn" onclick="openModal()">投稿</button>
+        <button class="btn btn-primary" onclick="fetchQuote()">换一句</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <span class="pill">声波风格 · 深色 · 品红/紫光</span>
+      <h1>舔狗日记
+        <br/>随机一句，一键复制</h1>
+      <p class="sub">打开即用：点一次“换一句”，点击卡片即可复制。也欢迎匿名投稿，把你的故事留在这里。</p>
+
+      <div class="panel" onclick="copyText()" title="点击复制">
+        <div class="panel-inner">
+          <div class="quote-mark">“</div>
+          <div id="quote">正在从数据库加载舔狗语录...</div>
+          <div class="hint">点击卡片即可复制</div>
+        </div>
+        <canvas id="wave" class="waves"></canvas>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="copyText()">复制当前</button>
+        <button class="btn" onclick="openModal()">我要投稿</button>
+      </div>
+
+      <div class="features">
+        <div class="feature"><h3>轻操作</h3><p>无需登录，直接使用</p></div>
+        <div class="feature"><h3>匿名投稿</h3><p>五秒提交一条</p></div>
+        <div class="feature"><h3>一键复制</h3><p>复制后即可转发</p></div>
+      </div>
+    </section>
+
+    <footer>© LICK.DOG · 情绪切片小站 · 声波主题</footer>
+  </div>
+
+  <!-- 拖尾容器 -->
+  <div class="trail" id="trail"></div>
+
+  <!-- 投稿弹窗 -->
+  <div id="modal" class="modal-wrap" onclick="if(event.target.id==='modal')closeModal()" style="position:fixed;inset:0;background:rgba(13,10,18,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:18px;z-index:4">
+    <div style="width:min(520px,100%);background:rgba(22,18,32,.9);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow)">
+      <h2 style="margin:0 0 6px">投稿一条新的舔狗语录</h2>
+      <p style="margin:0 0 10px;color:var(--muted)">建议 5-100 字，越像真人越有味道。</p>
+      <textarea id="submitText" placeholder="比如：你一天没回我，我还在想是不是你今天太忙了。" style="width:100%;min-height:120px;border-radius:12px;border:1px solid var(--border);padding:12px;resize:vertical;background:rgba(255,255,255,.03);color:var(--text)"></textarea>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button class="btn" onclick="closeModal()">算了</button>
+        <button class="btn btn-primary" onclick="submitQuote()">投稿</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" style="position:fixed;top:14px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.96);color:#0f1220;font-weight:900;box-shadow:0 16px 36px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;z-index:5"></div>
+
+  <script>
+    async function fetchQuote(){
+      const el=document.getElementById('quote');
+      el.style.opacity=.5;
+      try{ const r=await fetch('/api/quote'); const d=await r.json(); el.textContent=d.content; }
+      catch(e){ el.textContent='网络出错了，就像我们的关系一样，一直没真正连上。'; }
+      el.style.opacity=1;
+    }
+    function copyText(){ const t=document.getElementById('quote').innerText; navigator.clipboard.writeText(t).then(()=>toast('已复制')); }
+    async function submitQuote(){
+      const text=document.getElementById('submitText').value.trim(); if(!text) return toast('写点东西吧，沉默是舔不到的。');
+      try{ const r=await fetch('/api/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:text})}); const d=await r.json(); if(r.ok){ toast(d.message||'投稿成功'); document.getElementById('submitText').value=''; closeModal(); } else toast(d.error||'提交失败'); }
+      catch(e){ toast('提交失败，可能服务器也失恋了。'); }
+    }
+    function openModal(){ document.getElementById('modal').style.display='flex'; }
+    function closeModal(){ document.getElementById('modal').style.display='none'; }
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(window.__TT); window.__TT=setTimeout(()=>t.style.opacity=0, 2000); }
+
+    // 声波：多条正弦曲线叠加，低功耗绘制
+    ;(()=>{
+      const c=document.getElementById('wave'); if(!c) return; const ctx=c.getContext('2d');
+      function resize(){ c.width=c.clientWidth * devicePixelRatio; c.height=c.clientHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+      window.addEventListener('resize', resize, {passive:true}); resize();
+      let t=0; function draw(){
+        const w=c.clientWidth, h=c.clientHeight; ctx.clearRect(0,0,w,h);
+        const bands=[['#ff3d8c', .55, 10, 0.018], ['#a96bff', .45, 14, 0.014], ['#ff79b0', .35, 18, 0.012]];
+        bands.forEach((b,i)=>{ const [col,alpha,amp,spd]=b; ctx.beginPath(); for(let x=0;x<=w;x+=4){ const y=h*0.5 + Math.sin((x*0.02)+(t*spd)+i)*amp + Math.sin((x*0.011)-(t*spd*1.3))*amp*0.4; if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.strokeStyle=`${col}${Math.round(alpha*255).toString(16).padStart(2,'0')}`; ctx.lineWidth=2; ctx.stroke(); });
+        t+=1; requestAnimationFrame(draw);
+      } draw();
+    })();
+
+    // 鼠标拖尾：8 个点缓动跟随
+    ;(()=>{
+      const trail=document.getElementById('trail'); const dots=[]; const N=8; for(let i=0;i<N;i++){ const d=document.createElement('div'); d.className='dot'; trail.appendChild(d); dots.push({el:d,x:-9999,y:-9999}); }
+      let tx=-9999, ty=-9999; window.addEventListener('pointermove', e=>{ tx=e.clientX; ty=e.clientY; }, {passive:true});
+      function frame(){ let px=tx, py=ty; dots.forEach((d,i)=>{ d.x += (px - d.x) * (0.18 - i*0.012); d.y += (py - d.y) * (0.18 - i*0.012); d.el.style.transform=`translate(${d.x}px,${d.y}px)`; d.el.style.opacity = (tx>0? (0.28 - i*0.03) : 0); px=d.x; py=d.y; }); requestAnimationFrame(frame); }
+      frame();
+    })();
+
+    fetchQuote();
+  </script>
+</body>
+</html>
