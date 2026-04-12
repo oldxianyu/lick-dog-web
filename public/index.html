@@ -167,6 +167,16 @@
     .btn-sound-soft::after{background:#fff;opacity:.92}
     .btn-sound-soft::before{opacity:.5;filter:blur(4px)}
 
+    /* 吸睛款：投稿按钮专用（轻呼吸 + 柔粉内胆 + 微扫光） */
+    .btn-sound-accent{color:#2a2230; transform:scale(1.02)}
+    .btn-sound-accent::after{background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,245,250,.96))}
+    .btn-sound-accent::before{opacity:.9;filter:blur(10px)}
+    .btn-sound-accent .shine{position:absolute;inset:2px;border-radius:12px;overflow:hidden}
+    .btn-sound-accent .shine::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:36%;transform:skewX(-20deg);background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.42) 50%, rgba(255,255,255,0) 100%);filter:blur(2px);animation:shineSweep 3.2s ease-in-out infinite}
+    .btn-sound-accent{animation:gPulse 2.8s ease-in-out infinite}
+
+    @keyframes gPulse{0%,100%{filter:drop-shadow(0 8px 18px rgba(255,61,140,.20))}50%{filter:drop-shadow(0 12px 28px rgba(255,61,140,.34))}}
+
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
     @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
   </style>
@@ -192,10 +202,10 @@
       </div>
 
       <div class="actions">
-        <!-- 搭配：描边款（复制当前） -->
+        <!-- 搭配：描边款（用这个舔） -->
         <button class="btn-sound btn-sound-outline" onclick="copyText()"><span>用这个舔</span></button>
-        <!-- 搭配：柔和白内胆（我的投稿） -->
-        <button class="btn-sound btn-sound-soft" onclick="openModal()"><span>我要帮舔</span></button>
+        <!-- 吸睛款：我要帮舔（更想点） -->
+        <button class="btn-sound btn-sound-accent" onclick="openModal()"><span class="shine"></span><span>我要帮舔</span></button>
         <!-- 主色填充 + 扫光（换一个舔） -->
         <button class="btn-sound btn-sound-primary" onclick="fetchQuote()"><span class="shine"></span><span>换一个舔</span></button>
       </div>
