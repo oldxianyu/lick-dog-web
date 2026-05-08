@@ -191,6 +191,27 @@
 
     @keyframes btnFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
     @keyframes shineSweep{0%{left:-60%}100%{left:130%}}
+
+    /* 桃花运占卜 */
+    .peach-section{margin-top:32px}
+    .peach-card{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:28px 24px 24px;text-align:center;position:relative;overflow:hidden}
+    .peach-card::before{content:"🌸";position:absolute;top:-18px;right:-18px;font-size:80px;opacity:.12;pointer-events:none}
+    .peach-card h2{margin:0 0 4px;font-size:20px;background:linear-gradient(135deg,var(--primary),#ff9a6c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .peach-card .peach-sub{margin:0 0 18px;color:var(--muted);font-size:13px}
+    .peach-input-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .peach-input{height:42px;border-radius:999px;border:1px solid var(--border);padding:0 16px;font:inherit;width:220px;outline:none;transition:.2s}
+    .peach-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,61,140,.12)}
+    .peach-btn{height:42px;padding:0 20px;border-radius:999px;border:none;background:linear-gradient(135deg,#ff6aa8,#ff9a6c);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(255,106,168,.28);transition:.2s}
+    .peach-btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(255,106,168,.35)}
+    .peach-btn:active{transform:translateY(0)}
+    .peach-result{margin-top:18px;padding:18px;border-radius:14px;background:linear-gradient(135deg,rgba(255,106,168,.06),rgba(255,154,108,.06));border:1px dashed rgba(255,106,168,.25);display:none}
+    .peach-result.show{display:block;animation:peachFadeIn .4s ease}
+    @keyframes peachFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .peach-emoji{font-size:36px;margin-bottom:6px}
+    .peach-level{font-size:18px;font-weight:800;color:var(--primary);margin:4px 0}
+    .peach-desc{color:var(--muted);font-size:14px;line-height:1.7}
+    .peach-petal{position:fixed;pointer-events:none;z-index:30;font-size:20px;animation:petalFall 3s ease-in forwards}
+    @keyframes petalFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(85vh) rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -226,6 +247,23 @@
         <div class="feature"><h3>轻操作</h3><p>无需登录，直接使用</p></div>
         <div class="feature"><h3>匿名投稿</h3><p>五秒提交一条</p></div>
         <div class="feature"><h3>一键复制</h3><p>复制后即可转发</p></div>
+      </div>
+    </section>
+
+    <!-- 桃花运占卜 -->
+    <section class="peach-section">
+      <div class="peach-card">
+        <h2>🍑 桃花运占卜</h2>
+        <p class="peach-sub">输入你的名字，测测你今天的桃花运</p>
+        <div class="peach-input-row">
+          <input class="peach-input" id="peachName" placeholder="输入名字（留空也行）" maxlength="20" />
+          <button class="peach-btn" onclick="divinePeach()">开始占卜</button>
+        </div>
+        <div id="peachResult" class="peach-result">
+          <div class="peach-emoji" id="peachEmoji"></div>
+          <div class="peach-level" id="peachLevel"></div>
+          <div class="peach-desc" id="peachDesc"></div>
+        </div>
       </div>
     </section>
 
@@ -335,6 +373,51 @@
       window.addEventListener('pointermove', e=>{mx=e.clientX; my=e.clientY;}, {passive:true});
       window.addEventListener('pointerleave', ()=>{mx=-9999; my=-9999;}, {passive:true});
     })();
+
+    /* 桃花运占卜 */
+    const peachLevels=[
+      {emoji:"🌸",level:"桃花朵朵开",descs:["今天你的魅力值拉满，走到哪里都是焦点，有人正在偷偷关注你。","月老今天加班了，红线已经系好，记得出门打扮一下。","你的桃花运正在疯狂输出，今天遇到的人都可能变成故事。","有人在暗处看你笑的样子，想了很多遍。"]},
+      {emoji:"🍑",level:"桃花正旺",descs:["今天适合主动出击，一句话就能撩到心坎里。","你今天自带滤镜，怎么看怎么好看，异性缘爆棚。","有人正在编辑一段话又删掉，反复犹豫要不要找你。","今天遇到的陌生人里，有一个和你有故事的缘份。"]},
+      {emoji:"🌺",level:"桃花微开",descs:["你的桃花运正在酝酿中，再等等，好戏在后头。","今天有人想找你聊天但又不好意思开口，你可以主动一点。","月老今天摸鱼了，但你的好运还在路上。","今天适合发朋友圈，会有人悄悄点进去看。"]},
+      {emoji:"🪻",level:"桃花待放",descs:["你的桃花运今天比较安静，适合自我提升，明天再战。","月老今天请假了，但你的魅力值还在线。","今天适合独处，给自己充充电，桃花自然来。","别急，最好的总在不经意间出现。"]},
+      {emoji:"🥀",level:"桃花暂歇",descs:["今天你的桃花运在休息，但这不代表你不优秀。","月老今天去旅游了，你先忙自己的事吧。","今天适合搞钱，感情的事明天再说。","单身是暂时的，优秀是永恒的。"]}
+    ];
+    const peachTips=[
+      "记住：舔狗不得house，但桃花运可以有house。",
+      "今日宜：主动说晚安。忌：已读不回。",
+      "小贴士：回复消息快一点，桃花运会更好哦。",
+      "温馨提示：喜欢就去追，别等桃花谢了才后悔。",
+      "今日幸运色：粉色。幸运动作：微笑。"
+    ];
+    function divinePeach(){
+      const name=document.getElementById('peachName').value.trim()||'你';
+      const idx=Math.floor(Math.random()*peachLevels.length);
+      const level=peachLevels[idx];
+      const desc=level.descs[Math.floor(Math.random()*level.descs.length)];
+      const tip=peachTips[Math.floor(Math.random()*peachTips.length)];
+      document.getElementById('peachEmoji').textContent=level.emoji;
+      document.getElementById('peachLevel').textContent=name+'的桃花运：'+level.level;
+      document.getElementById('peachDesc').textContent=desc+' '+tip;
+      const r=document.getElementById('peachResult');
+      r.classList.remove('show');
+      void r.offsetWidth;
+      r.classList.add('show');
+      spawnPetals();
+    }
+    function spawnPetals(){
+      const petals=['🌸','🍑','💮','🩷','✨','💕'];
+      for(let i=0;i<12;i++){
+        setTimeout(()=>{
+          const el=document.createElement('div');
+          el.className='peach-petal';
+          el.textContent=petals[Math.floor(Math.random()*petals.length)];
+          el.style.left=Math.random()*100+'vw';
+          el.style.animationDuration=(2+Math.random()*2)+'s';
+          document.body.appendChild(el);
+          setTimeout(()=>el.remove(),4000);
+        },i*120);
+      }
+    }
   </script>
 </body>
 </html>
