@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lick-dog-web",
+  "pages_build_output_dir": "./public",
+  "compatibility_date": "2024-05-13",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lickdog-db",
+      "database_id": "dfca28af-5c80-4940-b806-3ccdf69b5423"
+    }
+  ]
+}

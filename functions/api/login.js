@@ -1,25 +1,41 @@
-export async function onRequestPost(context) {
-  const { username, password } = await context.request.json();
-
-  // 1. 查库验证密码
-  const user = await context.env.DB.prepare(
-    "SELECT * FROM users WHERE username = ? AND password = ?"
-  ).bind(username, password).first();
-
-  if (!user) {
-    return new Response(JSON.stringify({ error: "账号或密码错误" }), { status: 401 });
-  }
-
-  // 2. 生成一个简单的 Token (用随机数模拟)
-  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-
-  // 3. 把 Token 存入数据库，作为这次登录的凭证
-  await context.env.DB.prepare(
-    "UPDATE users SET token = ? WHERE id = ?"
-  ).bind(token, user.id).run();
-
-  // 4. 返回 Token 给前端
-  return new Response(JSON.stringify({ success: true, token }), {
-    headers: { "Content-Type": "application/json" }
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Cache-Control": "no-store"
+    }
   });
+}
+
+function createToken() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export async function onRequestPost(context) {
+  try {
+    const body = await context.request.json();
+    const username = typeof body?.username === "string" ? body.username.trim() : "";
+    const password = typeof body?.password === "string" ? body.password : "";
+
+    if (!username || !password) return json({ error: "请输入账号和密码" }, 400);
+
+    // 管理员使用隔离表，避免误读邮件系统的 users 表。
+    const user = await context.env.DB.prepare(
+      "SELECT id FROM lickdog_admin_users WHERE username = ? AND password = ? LIMIT 1"
+    ).bind(username, password).first();
+
+    if (!user) return json({ error: "账号或密码错误" }, 401);
+
+    const token = createToken();
+    await context.env.DB.prepare(
+      "UPDATE lickdog_admin_users SET token = ? WHERE id = ?"
+    ).bind(token, user.id).run();
+
+    return json({ success: true, token });
+  } catch {
+    return json({ error: "登录服务暂时不可用，请稍后再试" }, 500);
+  }
 }

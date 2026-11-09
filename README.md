@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS users (
     token TEXT
 );
 
--- 初始化管理员 (默认密码 123456)
+-- 初始化管理员 (示例密码 xianyu)
 INSERT INTO users (username, password) VALUES ('admin', '123456');
 
 -- 插入几条初始数据
@@ -107,9 +107,9 @@ Plaintext
 📝 默认账号
 后台地址：你的域名/admin.html
 
-用户名：admin
+用户名：xianyu
 
-密码：123456
+密码：xianyu
 
 (部署后请记得修改数据库中的密码)
 

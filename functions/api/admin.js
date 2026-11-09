@@ -1,8 +1,10 @@
-// 验证 Token 的辅助函数
 async function verifyToken(request, env) {
-  const token = request.headers.get("Authorization");
+  const rawToken = request.headers.get("Authorization") || "";
+  const token = rawToken.replace(/^Bearer\s+/i, "").trim();
   if (!token) return false;
-  const user = await env.DB.prepare("SELECT * FROM users WHERE token = ?").bind(token).first();
+  const user = await env.DB.prepare(
+    "SELECT id FROM lickdog_admin_users WHERE token = ? LIMIT 1"
+  ).bind(token).first();
   return !!user;
 }
 
