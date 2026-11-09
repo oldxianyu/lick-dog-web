@@ -27,7 +27,7 @@ async function visitorBucket(request, secret) {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret || "lickdog-guestbook"),
-    "HMAC",
+    { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
   );
